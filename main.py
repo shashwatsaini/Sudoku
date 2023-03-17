@@ -1,6 +1,7 @@
 import pygame
 import game
 import generator
+import data
 
 #defaults:
 MARGIN=66
@@ -9,6 +10,11 @@ GREEN=(0,255,0)
 WHITE= (255,255,255)
 fit=True
 
+start_time=0.0
+end_time=0.0
+time=0.0
+difficulty=0
+
 pygame.init()
 screen= pygame.display.set_mode((620,670))
 notes_board=[[[0 for x in range(9)] for x in range(9)] for x in range(9)]
@@ -16,21 +22,24 @@ font= pygame.font.Font('freesansbold.ttf', 32)
 
 #Gets the board
 def getboard(level, choice):
-    global firstboard, board
+    global firstboard, board, difficulty
     firstboard = [[0 for _ in range(9)] for _ in range(9)]
     board = [[0 for _ in range(9)] for _ in range(9)]
     if choice==1:
+        difficulty=level
         firstboard= generator.sudokuGenerate(firstboard, level)
         for x in range(9):
             for y in range(9):
                 board[x][y]= str(firstboard[x][y])
     elif choice==2:
         board= game.getgame_saved(board)
+    global start_time
+    start_time= data.start(1)
 
 #Draws the dimensions of the board
 def drawbg():
     screen.fill((255,255,255))
-    pygame.draw.rect(screen, (255,255,255), [20,20,650,670], 0)
+    pygame.draw.rect(screen, (255,255,255), [10,20,650,670], 0)
     pygame.draw.line(screen, (0,0,0), [200,0], [200,600], 5)
     pygame.draw.line(screen, (0,0,0), [400,0], [400,600], 5)
     pygame.draw.line(screen, (0,0,0), [0,200], [600,200],5)
@@ -40,7 +49,7 @@ def drawbg():
     pygame.draw.line(screen, (0,0,0), [0,0], [600,0], 10)
     pygame.draw.line(screen, (0,0,0), [0,610], [620,610],50)
     pygame.draw.line(screen, (0,0,0), [615,0],[615,600],30)
-    pygame.draw.line(screen, (0,0,0), [0,0],[0,600],50)
+    pygame.draw.line(screen, (0,0,0), [0,0],[0,600],20)
 
 #Adds all the numbers to the board
 def addnum(num, col, row):
@@ -112,11 +121,26 @@ def cursor(col,row, color):
     pygame.draw.rect(screen, color, [MARGIN*col+10, MARGIN*row+10, MARGIN-8, MARGIN-5],2)
 
 #Sets the condition for game over
+update_time=0
 def game_over():
     if game.check_win(board)==1:
+        global update_time, time, start_time, end_time, difficulty
+        update_time+=1
+        if update_time==1:
+            end_time=data.end(1)
+            print(start_time, ' ', end_time)
+            time= data.calculate_time(1, start_time, end_time)
+            print(time)
+            data.update_csv(difficulty, time)
+
         font2=pygame.font.Font('freesansbold.ttf', 72)
-        temp=font2.render('Game Over!', True, (255,0,0))
+        temp=font2.render('Game Over!', True, (255,0,0)) 
         screen.blit(temp, (100,280))
+        font3=pygame.font.Font('freesansbold.ttf', 36)
+        text= 'Solved in '+ str(time) +' seconds'
+        temp=font3.render(text, True, (255,0,0))
+        screen.blit(temp,(135, 350))
+        pygame.display.update()
 
 notes=False
 solves=True
@@ -135,18 +159,47 @@ def mode_notes():
         temp=font.render('Notes',True, RED)
         screen.blit(temp, (500, 595))
 
+check_test=0
+update=0
+def test():
+    global update, check_test, time, start_time, end_time
+    if check_test==1 and update==1:
+        end_time=data.end(1)
+        print(start_time, ' ', end_time)
+        time= data.calculate_time(1, start_time, end_time)
+        print(time)
+        update=0
+    if check_test==1:
+        font2=pygame.font.Font('freesansbold.ttf', 72)
+        temp=font2.render('Game Over!', True, (255,0,0)) 
+        screen.blit(temp, (100,280))
+        font3=pygame.font.Font('freesansbold.ttf', 36)
+        text= 'Solved in '+ str(time) +' seconds'
+        temp=font3.render(text, True, (255,0,0))
+        screen.blit(temp,(130, 350))
+        pygame.display.update() 
+
 #Game Loop
 def gameloop():
+    global check_test, update
     global run, flicker, fit
     global cursorx, cursory
     global screen
     global solves, notes
+    global start_time, end_time, time
     screen= pygame.display.set_mode((620,630))
+    pygame.display.set_caption('Sudoku')
+    icon= pygame.image.load('icon.png')
+    pygame.display.set_icon(icon)
     while run:
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
+                screen_highscore=pygame.display.set_mode((620,220))
                 run=False
             if event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_t:
+                    check_test=1
+                    update=1
                 if event.key==pygame.K_RIGHT:
                     cursorx+=1
                     fit=True
@@ -228,4 +281,5 @@ def gameloop():
         mode_notes()
         print_notes()
         game_over()
+        #test()
         pygame.display.update()
