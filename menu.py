@@ -85,36 +85,7 @@ def callMain(n):
     if n==4:
         main.getboard(0,2)
         main.gameloop()
-
-def display_highscore2():
-    screen_highscore=pygame.display.set_mode((300,600))
-    temp= font.render('Highscores:', True, (255,0,0))
-    run=True
-    max_list=pd.DataFrame()
-    max_list= data.highscore()
-    #max= max_list.iloc[0]
-    max_str_temp= max_list.to_string(index=False)
-    max_str_final=''
-    words=max_str_temp.split()
-    for i in words:
-        if i=='taken':
-            max_str_final+=i+'\n'
-        else:
-            max_str_final+=i+' '
-
-    #print(max)
-    print(max_str_final)
-    font3= pygame.font.Font('freesansbold.ttf', 10)
-    temp_max_str=font3.render(max_str_final, True, (255,0,0))
-    while run:
-        screen_highscore.fill((255,255,255))
-        screen_highscore.blit(temp,(60,90))
-        screen_highscore.blit(temp_max_str,(20,130))
-        for event in pygame.event.get():
-            if event.type==pygame.QUIT:
-                run=False
-                screen_highscore=pygame.display.set_mode((620,220))
-        pygame.display.update()
+        
 def display_highscore():
     screen_highscore=pygame.display.set_mode((300,600))
     temp= font.render('Highscores:', True, (255,0,0))
