@@ -159,26 +159,6 @@ def mode_notes():
         temp=font.render('Notes',True, RED)
         screen.blit(temp, (500, 595))
 
-check_test=0
-update=0
-def test():
-    global update, check_test, time, start_time, end_time
-    if check_test==1 and update==1:
-        end_time=data.end(1)
-        print(start_time, ' ', end_time)
-        time= data.calculate_time(1, start_time, end_time)
-        print(time)
-        update=0
-    if check_test==1:
-        font2=pygame.font.Font('freesansbold.ttf', 72)
-        temp=font2.render('Game Over!', True, (255,0,0)) 
-        screen.blit(temp, (100,280))
-        font3=pygame.font.Font('freesansbold.ttf', 36)
-        text= 'Solved in '+ str(time) +' seconds'
-        temp=font3.render(text, True, (255,0,0))
-        screen.blit(temp,(130, 350))
-        pygame.display.update() 
-
 #Game Loop
 def gameloop():
     global check_test, update
@@ -281,5 +261,4 @@ def gameloop():
         mode_notes()
         print_notes()
         game_over()
-        #test()
         pygame.display.update()
