@@ -16,7 +16,6 @@ bg= pygame.image.load('bg.jpg').convert_alpha()
 bg= pygame.transform.scale(bg, (620,220))
 bg.set_alpha(40)
 screen.blit(bg, (0,0))
-data.init()
 
 #Creates a class for buttons
 class Button():
