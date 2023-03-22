@@ -1,31 +1,35 @@
 import pygame
 import main
-import sys
 import data
 import pandas as pd
+import game
 
 pygame.init()
 objects = []
 run=True
 screen= pygame.display.set_mode((620, 220))
 icon= pygame.image.load('icon.png')
+pygame.display.set_caption('Sudoku')
 pygame.display.set_icon(icon)
-font = pygame.font.Font('freesansbold.ttf', 32)
-font2 = pygame.font.Font('freesansbold.ttf', 26)
+font = pygame.font.Font('Nexa-ExtraLight.ttf', 22)
+font2 = pygame.font.Font('Nexa-ExtraLight.ttf', 16)
+font3= pygame.font.Font('Nexa-ExtraLight.ttf',26)
 bg= pygame.image.load('bg.jpg').convert_alpha()
 bg= pygame.transform.scale(bg, (620,220))
 bg.set_alpha(40)
 screen.blit(bg, (0,0))
+save_time=game.gettime()
 
 #Creates a class for buttons
 class Button():
-    def __init__(self, x, y, width, height, buttonText='Button', onclickFunction=None, onePress=False):
+    def __init__(self, x, y, width, height, font_type, buttonText='Button', onclickFunction=None, onePress=False):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.onclickFunction = onclickFunction
         self.onePress = onePress
+        self.font_type=font_type
 
         self.fillColors = {
             'normal': '#ffffff',
@@ -36,7 +40,10 @@ class Button():
         self.buttonSurface = pygame.Surface((self.width, self.height))
         self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-        self.buttonSurf = font.render(buttonText, True, (20, 20, 20))
+        if self.font_type==1:
+            self.buttonSurf = font.render(buttonText, True, (20, 20, 20))
+        else:
+            self.buttonSurf = font2.render(buttonText, True, (20, 20, 20))
 
         self.alreadyPressed = False
 
@@ -84,13 +91,12 @@ def callMain(n):
     if n==4:
         main.getboard(0,2)
         main.gameloop()
-        
+
 def display_highscore():
     screen_highscore=pygame.display.set_mode((300,600))
-    temp= font.render('Highscores:', True, (255,0,0))
+    title= font.render('Highscores:', True, (0,0,0))
     run=True
     max_list=data.highscore()
-    #print(max_list)
     font3= pygame.font.Font('freesansbold.ttf', 14)
     max_list_str=[]
     count=0
@@ -105,37 +111,52 @@ def display_highscore():
         max_list_str[i]+='      '
         count+=1
     col_str='Difficulty  Date Played  Time Taken'
-    col_blit=font3.render(col_str, True, (255,0,0))
+    col_blit=font3.render(col_str, True, (0,0,0))
+    sudoku_text='Sudoku'
+    sudoku_text_blit=font.render(sudoku_text, True, (0,0,0))
     print(max_list_str)
     while run: 
         screen_highscore.fill((255,255,255))
-        screen_highscore.blit(temp,(60,90))
-        screen_highscore.blit(col_blit, (30, 130))
+        pygame.draw.rect(screen_highscore, (0,0,0), [0,0,300,40],2)
+        pygame.draw.rect(screen_highscore,(0,0,0),[0,560,300,40],2)
+        screen_highscore.blit(title,(10,3))
+        screen_highscore.blit(col_blit, (30, 60))
+        screen_highscore.blit(sudoku_text_blit,(200,565))
         #Columns:
         for x in range(len(max_list_str)):
-            score_blit=font3.render(max_list_str[x], True, (255,0,0))
-            screen_highscore.blit(score_blit,(80,150+(x*20)))
+            score_blit=font3.render(max_list_str[x], True, (0,0,0))
+            screen_highscore.blit(score_blit,(80,80+(x*20)))
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 run=False
                 screen_highscore=pygame.display.set_mode((620,220))
         pygame.display.update()
 
-customButton = Button(180, 60, 80, 30, '1', lambda: callMain(1))
-customButton = Button(280, 60, 80, 30, '2', lambda: callMain(2))
-customButton= Button(380, 60, 80, 30, '3', lambda: callMain(3))
-customButtton= Button(280, 140, 80, 30, 'Load', lambda: callMain(4))
-customButton= Button(235, 180, 180, 30, 'Highscore', lambda: display_highscore())
+customButton = Button(60, 90, 30, 30, 1, '1', lambda: callMain(1))
+customButton = Button(140, 90, 30, 30, 1, '2', lambda: callMain(2))
+customButton= Button(220, 90, 30, 30, 1, '3', lambda: callMain(3))
+customButtton= Button(356, 90, 200, 30, 2, 'Last Played on: '+ str(save_time), lambda: callMain(4))
+customButton= Button(20, 188, 140, 30, 1, 'Highscore', lambda: display_highscore())
 
 def drawbg():
     screen.fill((255,255,255))
     pygame.draw.rect(screen, (255,255,255), [0,0,620,200],0)
+    pygame.draw.rect(screen, (0,0,0),[0,180,620,190],5)
+    pygame.draw.line(screen, (0,0,0), (170,184), (170,220), 5)
+    pygame.draw.circle(screen, (0,0,0), (74,104),25,1)
+    pygame.draw.circle(screen, (0,0,0), (154, 104),25,1)
+    pygame.draw.circle(screen, (0,0,0), (234, 104),25,1)
+    text=font.render('Sudoku', True, (0,0,0))
+    screen.blit(text, (500,188))
 
 def level_text():
-    temp= font2.render('Choose a level', True, (0,0,0))
-    screen.blit(temp, (230,20))
-    temp2= font2.render('Or load a saved game', True, (0,0,0))
-    screen.blit(temp2, (180,100))
+    pygame.draw.rect(screen, (0,0,0), [40,12,230,50],1,20)
+    pygame.draw.rect(screen, (0,0,0), [340,12,230,50],1,20)
+    pygame.draw.rect(screen, (0,0,0), [335,85,240,40],1,20)
+    temp= font3.render('New Game', True, (0,0,0))
+    screen.blit(temp, (90,20))
+    temp2= font3.render('Load Game', True, (0,0,0))
+    screen.blit(temp2, (385,20))
 
 while run:
     drawbg()

@@ -1,7 +1,10 @@
 import random
+from datetime import datetime
 
 #Saves the game
 def savegame(game):
+    now= datetime.now()
+    time= now.strftime("%H:%M:%S")
     file=open('save.txt','w')
     stream=''
     count=0
@@ -13,9 +16,18 @@ def savegame(game):
                 break
         if(count==81):
             break
+    stream+='e'
+    stream+=time
     file.write(stream)
     file.close()
 
+#Gets the time from the save file
+def gettime():
+    file= open('save.txt','r')
+    stream=file.read(82)
+    stream=file.read(8)
+    return stream
+    
 #Gets the saved game
 def getgame_saved(game):
     file=open('save.txt', 'r')

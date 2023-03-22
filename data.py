@@ -28,18 +28,23 @@ def calculate_time(check, start_time, end_time):
     diff_time=math.trunc(diff_time)
     return diff_time
 
-#To initialize the csv file, if it does not exist
-def init():
+#To initialize stream, which stores the dataframe
+def init(check):
     #defaut csv: game_number,difficulty,date_played,time_taken
     global stream
-    stream= pd.DataFrame(columns=['game_number', 'difficulty', 'date_played', 'time_taken'])
-    stream.to_csv('stats.csv', index=False)
-    stream= pd.read_csv('stats.csv')
+    if check==1:
+        stream= pd.DataFrame(columns=['game_number', 'difficulty', 'date_played', 'time_taken'])
+        stream.to_csv('stats.csv', index=False)
+        stream= pd.read_csv('stats.csv')
+    elif check==0:
+        stream=pd.read_csv('stats.csv')
 
 #Updates the stats.csv file
 def update_csv(difficulty, time_taken):
     if not os.path.exists('stats.csv'):
-        init()
+        init(1)
+    else:
+        init(0)
     global stream
     date_played= datetime.date.today()
     game_number= stream.shape[0]+1
@@ -51,7 +56,9 @@ def update_csv(difficulty, time_taken):
 #To get the highscores for each level
 def highscore():
     if not os.path.exists('stats.csv'):
-        init()
+        init(1)
+    else:
+        init(0)
     global stream
     max=-1
     max_list=[]
@@ -76,5 +83,5 @@ def highscore():
         max_list.append(x)
     for x in max_list_3:
         max_list.append(x)
+    print(max_list_1)
     return max_list
-

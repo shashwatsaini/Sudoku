@@ -2,12 +2,15 @@ import pygame
 import game
 import generator
 import data
+import sys
 
 #defaults:
 MARGIN=66
 RED= (255,0,0)
 GREEN=(0,255,0)
 WHITE= (255,255,255)
+BLACK=(0,0,0)
+GRAY=(190,190,190)
 fit=True
 
 start_time=0.0
@@ -35,44 +38,60 @@ def getboard(level, choice):
         board= game.getgame_saved(board)
     global start_time
     start_time= data.start(1)
+    global default_board
+    default_board= [[0 for _ in range(9)] for _ in range(9)]
+    for x in range(9):
+        for y in range(9):
+            if firstboard[x][y]!=0:
+                default_board[x][y]=1
 
 #Draws the dimensions of the board
 def drawbg():
-    screen.fill((255,255,255))
-    pygame.draw.rect(screen, (255,255,255), [10,20,650,670], 0)
-    pygame.draw.line(screen, (0,0,0), [200,0], [200,600], 5)
-    pygame.draw.line(screen, (0,0,0), [400,0], [400,600], 5)
-    pygame.draw.line(screen, (0,0,0), [0,200], [600,200],5)
-    pygame.draw.line(screen, (0,0,0), [0,400], [600,400],5)
+    screen.fill((WHITE))
+    pygame.draw.rect(screen, (WHITE), [10,20,650,670], 0)
+
+    #default puzzle numbers:
+    for x in range(9):
+        for y in range(9):
+            if default_board[x][y]==1:
+                pygame.draw.rect(screen,(190,190,190),[MARGIN*x+8, MARGIN*y+8, MARGIN-6, MARGIN-3])
 
     #border:
-    pygame.draw.line(screen, (0,0,0), [0,0], [600,0], 10)
-    pygame.draw.line(screen, (0,0,0), [0,610], [620,610],50)
-    pygame.draw.line(screen, (0,0,0), [615,0],[615,600],30)
-    pygame.draw.line(screen, (0,0,0), [0,0],[0,600],20)
+    for x in range(9):
+        pygame.draw.line(screen, (150,150,150),[70+MARGIN*x,0],[70+MARGIN*x,600],7)
+        pygame.draw.line(screen,(150,150,150),[0,70+MARGIN*x],[620,70+MARGIN*x],7)
+
+    pygame.draw.line(screen, (BLACK), [201,0], [201,600], 7)
+    pygame.draw.line(screen, (BLACK), [400,0], [400,600], 7)
+    pygame.draw.line(screen, (BLACK), [0,201], [600,201],7)
+    pygame.draw.line(screen, (BLACK), [0,400], [600,400],7)
+
+    pygame.draw.line(screen, (BLACK), [0,0], [600,0], 16)
+    pygame.draw.line(screen, (BLACK), [0,620], [620,620],50)
+    pygame.draw.line(screen, (BLACK), [615,0],[615,600],40)
+    pygame.draw.line(screen, (BLACK), [0,0],[0,600],20)
 
 #Adds all the numbers to the board
 def addnum(num, col, row):
     if num==0:
         return
-    temp=font.render(str(num), True, (0,0,0))
+    temp=font.render(str(num), True, (BLACK))
     screen.blit(temp, (33+(col*MARGIN), 30+row*MARGIN))
 
 
 #Gets the entered number, and checks if it is a compatible fit
 def solve(num, col, row):
     global fit
-    global board, notes_board
-    if board[row][col]=='0':
+    global board, notes_board, default_board
+    if default_board[row][col]==0 or notes_board[col][row]=='0':
         check=game.check_fit(board, num, row+1, col+1)
-        print(check)
         if check==1:
             board[row][col]=str(num)
         if check==0:
             fit=False
         for x in range(9):
             notes_board[col][row][x]=0
-        pygame.draw.rect(screen, (0,0,0),[33+(col-1)*MARGIN, 33+(row-1)*MARGIN, 33+row*MARGIN, 33+col*MARGIN])
+        pygame.draw.rect(screen, (BLACK),[33+(col-1)*MARGIN, 33+(row-1)*MARGIN, 33+row*MARGIN, 33+col*MARGIN])
         pygame.display.update()
 
 #Adding notes
@@ -82,7 +101,7 @@ def addnotes(num, row, col):
         notes_board[row][col][num-1]=num
     else:
         notes_board[row][col][num-1]=0
-        pygame.draw.rect(screen, (0,0,0),[33+(col-1)*MARGIN, 33+(row-1)*MARGIN, 33+row*MARGIN, 33+col*MARGIN])
+        pygame.draw.rect(screen, (BLACK),[33+(col-1)*MARGIN, 33+(row-1)*MARGIN, 33+row*MARGIN, 33+col*MARGIN])
         pygame.display.update()
     
 #Printing the notes
@@ -94,7 +113,7 @@ def print_notes():
             for n in range(9):
                 num= notes_board[x][y][n]
                 if num!= 0:
-                    temp=font3.render(str(notes_board[x][y][n]), True, (0,0,0))
+                    temp=font3.render(str(notes_board[x][y][n]), True, (BLACK))
                     if num==1:
                         screen.blit(temp, (12+(y*MARGIN), 10+x*MARGIN))
                     if num==2:
@@ -149,15 +168,20 @@ flicker=False
 
 def mode_solves():
     global solves
+    font2=pygame.font.Font('freesansbold.ttf',26)
     if solves==True:
-        temp=font.render('Solve',True, RED)
-        screen.blit(temp, (500, 595))
+        temp=font2.render('Solve',True, RED)
+        screen.blit(temp, (520, 600))
 
 def mode_notes():
     global notes
+    font2=pygame.font.Font('freesansbold.ttf',26)
     if notes==True:
-        temp=font.render('Notes',True, RED)
-        screen.blit(temp, (500, 595))
+        temp=font2.render('Notes',True, RED)
+        screen.blit(temp, (520, 600))
+
+check_test=0
+update=0
 
 #Game Loop
 def gameloop():
@@ -176,10 +200,15 @@ def gameloop():
             if event.type==pygame.QUIT:
                 screen_highscore=pygame.display.set_mode((620,220))
                 run=False
+                sys.exit()
+            if event.type==pygame.MOUSEBUTTONDOWN:
+                    pos= list(pygame.mouse.get_pos())
+                    pos[0]=int((pos[0]-MARGIN/2+33)/MARGIN)
+                    pos[1]=int((pos[1]-MARGIN/2+33)/MARGIN)
+                    cursorx=pos[0]
+                    cursory=pos[1]
+                    fit=True
             if event.type==pygame.KEYDOWN:
-                if event.key==pygame.K_t:
-                    check_test=1
-                    update=1
                 if event.key==pygame.K_RIGHT:
                     cursorx+=1
                     fit=True
