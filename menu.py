@@ -1,16 +1,16 @@
 import pygame
 import main
 import data
-import pandas as pd
 import game
+from tkinter import *
 
 pygame.init()
 objects = []
 run=True
 screen= pygame.display.set_mode((620, 220))
 icon= pygame.image.load('icon.png')
-pygame.display.set_caption('Sudoku')
 pygame.display.set_icon(icon)
+pygame.display.set_caption('Sudoku')
 font = pygame.font.Font('Nexa-ExtraLight.ttf', 22)
 font2 = pygame.font.Font('Nexa-ExtraLight.ttf', 16)
 font3= pygame.font.Font('Nexa-ExtraLight.ttf',26)
@@ -114,7 +114,6 @@ def display_highscore():
     col_blit=font3.render(col_str, True, (0,0,0))
     sudoku_text='Sudoku'
     sudoku_text_blit=font.render(sudoku_text, True, (0,0,0))
-    print(max_list_str)
     while run: 
         screen_highscore.fill((255,255,255))
         pygame.draw.rect(screen_highscore, (0,0,0), [0,0,300,40],2)
@@ -135,19 +134,25 @@ def display_highscore():
 customButton = Button(60, 90, 30, 30, 1, '1', lambda: callMain(1))
 customButton = Button(140, 90, 30, 30, 1, '2', lambda: callMain(2))
 customButton= Button(220, 90, 30, 30, 1, '3', lambda: callMain(3))
-customButtton= Button(356, 90, 200, 30, 2, 'Last Played on: '+ str(save_time), lambda: callMain(4))
-customButton= Button(20, 188, 140, 30, 1, 'Highscore', lambda: display_highscore())
+
+#Checking if save file is empty:
+if save_time=='':
+    customButton= Button(356, 90, 200, 30, 2, 'Create a New Game!', lambda: None)
+else:
+    customButtton= Button(356, 90, 200, 30, 2, 'Last Played on: '+ str(save_time), lambda: callMain(4))
+
+customButton= Button(18, 185, 140, 30, 1, 'Highscore', lambda: display_highscore())
 
 def drawbg():
     screen.fill((255,255,255))
     pygame.draw.rect(screen, (255,255,255), [0,0,620,200],0)
-    pygame.draw.rect(screen, (0,0,0),[0,180,620,190],5)
+    pygame.draw.rect(screen, (0,0,0),[0,180,620,40],5)
     pygame.draw.line(screen, (0,0,0), (170,184), (170,220), 5)
     pygame.draw.circle(screen, (0,0,0), (74,104),25,1)
     pygame.draw.circle(screen, (0,0,0), (154, 104),25,1)
     pygame.draw.circle(screen, (0,0,0), (234, 104),25,1)
     text=font.render('Sudoku', True, (0,0,0))
-    screen.blit(text, (500,188))
+    screen.blit(text, (500,185))
 
 def level_text():
     pygame.draw.rect(screen, (0,0,0), [40,12,230,50],1,20)

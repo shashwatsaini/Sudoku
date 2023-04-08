@@ -1,4 +1,4 @@
-Prerequisites: Pygame, pandas
+Prequisites: Pygame
 
 How to run: Run the menu.py file. Make sure all other files are in the same directory
 
