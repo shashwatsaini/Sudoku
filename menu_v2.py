@@ -1,19 +1,18 @@
 import pygame
 import main
+import sys
 import data
+import pandas as pd
+import time
 import game
-import settings
-from tkinter import *
-
-check=0
 
 pygame.init()
 objects = []
 run=True
 screen= pygame.display.set_mode((620, 220))
 icon= pygame.image.load('icon.png')
-pygame.display.set_icon(icon)
 pygame.display.set_caption('Sudoku')
+pygame.display.set_icon(icon)
 font = pygame.font.Font('Nexa-ExtraLight.ttf', 22)
 font2 = pygame.font.Font('Nexa-ExtraLight.ttf', 16)
 font3= pygame.font.Font('Nexa-ExtraLight.ttf',26)
@@ -21,6 +20,7 @@ bg= pygame.image.load('bg.jpg').convert_alpha()
 bg= pygame.transform.scale(bg, (620,220))
 bg.set_alpha(40)
 screen.blit(bg, (0,0))
+
 save_time=game.gettime()
 
 #Creates a class for buttons
@@ -134,34 +134,22 @@ def display_highscore():
                 screen_highscore=pygame.display.set_mode((620,220))
         pygame.display.update()
 
-def open_settings():
-    global check
-    check=1
-
 customButton = Button(60, 90, 30, 30, 1, '1', lambda: callMain(1))
 customButton = Button(140, 90, 30, 30, 1, '2', lambda: callMain(2))
 customButton= Button(220, 90, 30, 30, 1, '3', lambda: callMain(3))
-
-#Checking if save file is empty:
-if save_time=='':
-    customButton= Button(356, 90, 200, 30, 2, 'Create a New Game!', lambda: None)
-else:
-    customButtton= Button(356, 90, 200, 30, 2, 'Last Played on: '+ str(save_time), lambda: callMain(4))
-
-customButton= Button(18, 185, 140, 30, 1, 'Highscore', lambda: display_highscore())
-customButton= Button(170, 185, 140, 30, 1, 'Settings', lambda: open_settings())
+customButtton= Button(356, 90, 200, 30, 2, 'Last Played on: '+ str(save_time), lambda: callMain(4))
+customButton= Button(20, 188, 140, 30, 1, 'Highscore', lambda: display_highscore())
 
 def drawbg():
     screen.fill((255,255,255))
     pygame.draw.rect(screen, (255,255,255), [0,0,620,200],0)
-    pygame.draw.rect(screen, (0,0,0),[0,180,620,40],5)
+    pygame.draw.rect(screen, (0,0,0),[0,180,620,190],5)
     pygame.draw.line(screen, (0,0,0), (170,184), (170,220), 5)
-    pygame.draw.line(screen, (0,0,0), (310,184), (310, 220), 5)
     pygame.draw.circle(screen, (0,0,0), (74,104),25,1)
     pygame.draw.circle(screen, (0,0,0), (154, 104),25,1)
     pygame.draw.circle(screen, (0,0,0), (234, 104),25,1)
     text=font.render('Sudoku', True, (0,0,0))
-    screen.blit(text, (500,185))
+    screen.blit(text, (500,188))
 
 def level_text():
     pygame.draw.rect(screen, (0,0,0), [40,12,230,50],1,20)
@@ -171,38 +159,6 @@ def level_text():
     screen.blit(temp, (90,20))
     temp2= font3.render('Load Game', True, (0,0,0))
     screen.blit(temp2, (385,20))
-
-top= Tk()
-top.geometry('400x160')
-top.title('Settings')
-
-C1_check = IntVar()
-C2_check = IntVar()
-C3_check = IntVar()
-
-file = open('settings.txt', 'r')
-stream = file.read()
-print(stream)
-stream_list = stream.split(',')
-file.close()
-
-C1_var= int(stream_list[0])
-C2_var= int(stream_list[1])
-C3_var= int(stream_list[2])
-
-C1_check.set(int(stream_list[0]))
-C2_check.set(int(stream_list[1]))
-C3_check.set(int(stream_list[2]))
-
-title = Label(top, text='Settings:', font=('Nexa-ExtraLight.ttf', 18))
-C1 = Checkbutton(top, text='Warn when entry is wrong', variable=C1_check, onvalue=1, offvalue=0, height=1, width=20, font=('Nexa-ExtraLight.ttf', 10))
-C2 = Checkbutton(top, text='Check if pencil value is correct', variable=C2_check, onvalue=1, offvalue=0, height=1, width=25, font=('Nexa-ExtraLight.ttf', 10))
-C3 = Checkbutton(top, text='Automatic pencil value removal', variable=C3_check, onvalue=1, offvalue=0, height=1, width=25, font=('Nexa-ExtraLight.ttf', 10))
-
-title.pack()
-C1.pack()
-C2.pack()
-C3.pack()
 
 while run:
     drawbg()
@@ -214,13 +170,3 @@ while run:
         object.process()
     screen.blit(bg, (0,0))
     pygame.display.update()
-    if check==1:
-        C1_var= C1_check.get()
-        C2_var= C2_check.get()
-        C3_var= C3_check.get()
-        print(C1_var, C2_var, C3_var)
-        try:
-           top.update()
-        except TclError:
-           check=0
-

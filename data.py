@@ -83,5 +83,4 @@ def highscore():
         max_list.append(x)
     for x in max_list_3:
         max_list.append(x)
-    print(max_list_1)
     return max_list
