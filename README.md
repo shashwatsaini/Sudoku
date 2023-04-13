@@ -1,7 +1,7 @@
 # Sudoku
 A Sudoku game made in pygame, with a generator.
 
-Prequisites: Pygame, pandas, tkinter
+Prerequisites: Pygame, pandas, tkinter
 
 How to run: Run the menu.py file. Make sure all other files are in the same directory
 Refer to the attached documentation file for more information.
